@@ -1,0 +1,3 @@
+[run]
+source = puzzle_app
+omit = puzzle_app/test*
