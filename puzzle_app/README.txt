@@ -20,6 +20,10 @@ Getting Started
 
     env/bin/pip install -e ".[testing]"
 
+- Configure the database.
+
+    env/bin/initialize_puzzle_app_db development.ini
+
 - Run your project's tests.
 
     env/bin/pytest

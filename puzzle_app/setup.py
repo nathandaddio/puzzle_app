@@ -10,9 +10,14 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'plaster_pastedeploy',
-    'pyramid',
-    'pyramid_jinja2',
+    'pyramid >= 1.9a',
     'pyramid_debugtoolbar',
+    'pyramid_jinja2',
+    'pyramid_retry',
+    'pyramid_tm',
+    'SQLAlchemy',
+    'transaction',
+    'zope.sqlalchemy',
     'waitress',
 ]
 
@@ -47,6 +52,9 @@ setup(
     entry_points={
         'paste.app_factory': [
             'main = puzzle_app:main',
+        ],
+        'console_scripts': [
+            'initialize_puzzle_app_db = puzzle_app.scripts.initializedb:main',
         ],
     },
 )
