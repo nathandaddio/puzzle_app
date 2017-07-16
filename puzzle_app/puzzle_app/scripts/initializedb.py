@@ -9,13 +9,15 @@ from pyramid.paster import (
 
 from pyramid.scripts.common import parse_vars
 
-from ..models.meta import Base
-from ..models import (
+from puzzle_app.models.meta import Base
+from puzzle_app.models import (
     get_engine,
     get_session_factory,
     get_tm_session,
     )
-from ..models import MyModel
+
+
+from puzzle_app.models import HitoriGameBoard, HitoriGameBoardCell
 
 
 def usage(argv):
@@ -40,6 +42,10 @@ def main(argv=sys.argv):
 
     with transaction.manager:
         dbsession = get_tm_session(session_factory, transaction.manager)
+        board = HitoriGameBoard(number_of_rows=9, number_of_columns=9)
+        cell = HitoriGameBoardCell(hitori_game_board=board, row_number=2, column_number=5, value=9)
+        dbsession.add_all([board, cell])
 
-        model = MyModel(name='one', value=1)
-        dbsession.add(model)
+
+if __name__ == "__main__":
+    main()

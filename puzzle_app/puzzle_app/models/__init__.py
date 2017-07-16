@@ -3,9 +3,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import configure_mappers
 import zope.sqlalchemy
 
-# import or define all models here to ensure they are attached to the
-# Base.metadata prior to any initialization routines
-from .mymodel import MyModel  # flake8: noqa
+from puzzle_app.models.hitori import (
+    HitoriGameBoard,
+    HitoriGameBoardCell,
+)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
@@ -72,6 +73,6 @@ def includeme(config):
     config.add_request_method(
         # r.tm is the transaction manager used by pyramid_tm
         lambda r: get_tm_session(session_factory, r.tm),
-        'dbsession',
+        'db_session',
         reify=True
     )
