@@ -25,6 +25,8 @@ class HitoriGameBoard(Base):
     cells = relationship('HitoriGameBoardCell', back_populates='hitori_game_board',
                          cascade="all, delete-orphan")
 
+    solved = Column(Boolean(name="solved"))
+
 
 class HitoriGameBoardCell(Base):
     __tablename__ = 'hitori_game_board_cells'
