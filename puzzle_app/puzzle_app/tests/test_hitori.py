@@ -93,13 +93,13 @@ def test_hitori_game_board_get(dummy_request, db_session):
     assert len(response) == 1
 
     game_board_json = response[0]
-    assert game_board_json['board_id'] == game_board.id
+    assert game_board_json['id'] == game_board.id
     assert game_board_json['number_of_rows'] == game_board.number_of_rows
     assert game_board_json['number_of_columns'] == game_board.number_of_columns
     assert len(game_board_json['cells']) == 1
 
     cell_json = game_board_json['cells'][0]
-    assert cell_json['cell_id'] == cell.id
+    assert cell_json['id'] == cell.id
     assert cell_json['row_number'] == cell.row_number
     assert cell_json['column_number'] == cell.column_number
     assert cell_json['value'] == cell.value
