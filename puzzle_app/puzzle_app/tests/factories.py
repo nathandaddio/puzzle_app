@@ -1,5 +1,5 @@
 import factory
-import pytest
+
 
 from puzzle_app.models.hitori import (
     HitoriGameBoard,
@@ -13,6 +13,7 @@ class HitoriGameBoardFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     number_of_rows = 9
     number_of_columns = 9
+    solved = False
 
 
 class HitoriGameBoardCellFactory(factory.alchemy.SQLAlchemyModelFactory):
