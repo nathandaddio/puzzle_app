@@ -22,6 +22,7 @@ requires = [
     'transaction',
     'zope.sqlalchemy',
     'waitress',
+    'webargs'
 ]
 
 tests_require = [

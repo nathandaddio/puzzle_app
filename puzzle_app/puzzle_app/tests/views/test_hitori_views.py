@@ -1,7 +1,9 @@
 import pytest
 
+from pyramid.exceptions import HTTPNotFound
 
-from puzzle_app.views.hitori import hitori_boards_get
+
+from puzzle_app.views.hitori import hitori_boards_get, hitori_board_get
 
 
 from factories import (
@@ -33,11 +35,11 @@ class TestHitoriGameBoardsGet:
         return cells
 
     @pytest.fixture
-    def response(self, dummy_request):
+    def boards_response(self, dummy_request):
         return hitori_boards_get(dummy_request)
 
     @pytest.fixture
-    def expected_response(self, board, cells):
+    def expected_boards_response(self, board, cells):
         return [
             {
                 'id': board.id,
@@ -63,5 +65,26 @@ class TestHitoriGameBoardsGet:
             }
         ]
 
-    def test_hitori_game_board_get(self, board, cells, response, expected_response):
-        assert response == expected_response
+    def test_hitori_game_boards_get(self, board, cells, boards_response, expected_boards_response):
+        assert boards_response == expected_boards_response
+
+    @pytest.fixture
+    def board_request(self, board, dummy_request):
+        dummy_request.matchdict['board_id'] = board.id
+        return dummy_request
+
+    @pytest.fixture
+    def board_response(self, board_request):
+        return hitori_board_get(board_request)
+
+    def test_hitori_game_board_get(self, board, cells, board_response, expected_boards_response):
+        assert board_response == expected_boards_response[0]
+
+    @pytest.fixture
+    def bad_board_id_request(self, dummy_request):
+        dummy_request.matchdict['board_id'] = 100
+        return dummy_request
+
+    def test_board_get_bad_id(self, bad_board_id_request):
+        with pytest.raises(HTTPNotFound):
+            hitori_board_get(bad_board_id_request)

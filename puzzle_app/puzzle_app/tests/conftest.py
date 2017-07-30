@@ -18,7 +18,6 @@ def app_config():
 
 @pytest.fixture
 def db_session(app_config):
-    print(app_config.registry)
     session = app_config.registry['dbsession_factory']()
     engine = session.bind
     Base.metadata.create_all(engine)
@@ -27,9 +26,6 @@ def db_session(app_config):
 
 @pytest.fixture
 def dummy_request(db_session):
-    # Because we're using DummyRequest here, we need to manually add the
-    # db_session to the request. config.add_request_method doesn't work
-    # on dummy requests. No hardship though!
     return testing.DummyRequest(db_session=db_session)
 
 
