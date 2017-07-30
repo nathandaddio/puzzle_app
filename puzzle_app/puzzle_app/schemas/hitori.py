@@ -1,6 +1,7 @@
 from marshmallow import (
     fields,
     Schema,
+    post_dump
 )
 
 
@@ -24,3 +25,8 @@ class HitoriGameBoardSchema(Schema):
     cells = fields.Nested(HitoriGameBoardCellSchema, many=True, required=True)
 
     solved = fields.Bool(allow_none=True)
+
+    @post_dump
+    def order_cells(self, data):
+        data['cells'] = sorted(data['cells'], key=lambda cell: (cell['row_number'], cell['column_number']))
+        return data

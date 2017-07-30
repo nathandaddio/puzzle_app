@@ -1,7 +1,9 @@
 import factory
 
+import pytest
 
-from puzzle_app.models.hitori import (
+
+from puzzle_app.models import (
     HitoriGameBoard,
     HitoriGameBoardCell
 )
