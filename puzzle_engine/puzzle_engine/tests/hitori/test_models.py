@@ -184,6 +184,12 @@ class TestCell:
     def test_cell_init(self, data, cell):
         check_attributes(data, cell)
 
+    def test_cell_repr(self, data, cell):
+        assert (
+            repr(cell) ==
+            "Cell(row={row_number},column={column_number},value={value})".format(**data)
+        )
+
 
 class TestEngineData:
     @pytest.fixture

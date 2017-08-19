@@ -1,4 +1,5 @@
 from collections import namedtuple
+from itertools import combinations
 
 
 class Board(object):
@@ -34,8 +35,7 @@ CellIncompatibility = namedtuple('CellIncompatability', ['cell_1', 'cell_2'])
 def cell_incompatibility_factory(cells):
     return [
         CellIncompatibility(cell_1, cell_2)
-        for i, cell_1 in enumerate(cells)
-        for cell_2 in cells[i+1:]
+        for cell_1, cell_2 in combinations(cells, 2)
         if are_incompatible_cells(cell_1, cell_2)
     ]
 
@@ -56,8 +56,7 @@ CellAdjacency = namedtuple('CellAdjacency', ['cell_1', 'cell_2'])
 def cell_adjacency_factory(cells):
     return [
         CellAdjacency(cell_1, cell_2)
-        for i, cell_1 in enumerate(cells)
-        for cell_2 in cells[i+1:]
+        for cell_1, cell_2 in combinations(cells, 2)
         if are_adjacent_cells(cell_1, cell_2)
     ]
 

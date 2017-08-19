@@ -1,14 +1,17 @@
 import pytest
 
-from puzzle_engine.hitori.models import (Board, Cell, EngineData)
+from puzzle_engine.hitori.models import (
+    Board,
+    Cell,
+    EngineData
+)
 
 from puzzle_engine.hitori.engine import HitoriEngine
 
 
-class TestHitoriEngineOnSimpleDataset:
-    @pytest.fixture
-    def grid(self):
-        return [
+class TestHitoriEngine:
+    grids = [
+        [
             [4, 8, 1, 6, 3, 2, 5, 7],
             [3, 6, 7, 2, 1, 6, 5, 4],
             [2, 3, 4, 8, 2, 8, 6, 1],
@@ -17,31 +20,105 @@ class TestHitoriEngineOnSimpleDataset:
             [3, 5, 6, 7, 3, 1, 8, 4],
             [6, 4, 2, 3, 5, 4, 7, 8],
             [8, 7, 1, 4, 2, 3, 5, 6]
+        ],
+        [
+            [12, 12, 4, 1, 11, 8, 10, 2, 3, 3, 11, 10],
+            [6, 7, 3, 3, 5, 2, 11, 4, 9, 12, 5, 1],
+            [8, 12, 9, 8, 6, 5, 3, 10, 2, 5, 2, 12],
+            [10, 1, 1, 5, 5, 7, 8, 9, 3, 7, 6, 2],
+            [6, 11, 2, 8, 2, 10, 8, 3, 10, 6, 9, 11],
+            [3, 8, 12, 11, 8, 4, 2, 12, 6, 1, 5, 9],
+            [9, 7, 3, 3, 11, 5, 11, 12, 5, 7, 4, 4],
+            [5, 9, 9, 6, 7, 2, 1, 8, 2, 1, 4, 12],
+            [11, 5, 8, 10, 7, 12, 9, 11, 5, 4, 7, 10],
+            [8, 1, 1, 7, 8, 7, 10, 11, 9, 9, 11, 3],
+            [1, 5, 2, 12, 2, 9, 7, 8, 10, 8, 3, 11],
+            [7, 9, 6, 9, 1, 10, 4, 5, 6, 2, 10, 1],
         ]
+    ]
+
+    solutions = [
+        [
+            (0, 0),
+            (0, 2),
+            (0, 6),
+            (1, 5),
+            (2, 0),
+            (2, 3),
+            (3, 2),
+            (3, 5),
+            (3, 7),
+            (4, 1),
+            (4, 3),
+            (5, 0),
+            (5, 4),
+            (5, 7),
+            (6, 1),
+            (7, 4),
+            (7, 6)
+        ],
+        [
+            (0, 1),
+            (0, 4),
+            (0, 6),
+            (0, 8),
+            (1, 2),
+            (1, 10),
+            (2, 3),
+            (2, 5),
+            (2, 8),
+            (2, 11),
+            (3, 1),
+            (3, 4),
+            (3, 9),
+            (4, 0),
+            (4, 2),
+            (4, 6),
+            (4, 8),
+            (4, 11),
+            (5, 4),
+            (5, 7),
+            (6, 1),
+            (6, 3),
+            (6, 6),
+            (6, 8),
+            (6, 10),
+            (7, 2),
+            (7, 5),
+            (7, 9),
+            (8, 1),
+            (8, 4),
+            (8, 7),
+            (8, 11),
+            (9, 0),
+            (9, 2),
+            (9, 5),
+            (9, 8),
+            (9, 10),
+            (10, 4),
+            (10, 7),
+            (11, 1),
+            (11, 5),
+            (11, 8),
+            (11, 11)
+        ]
+    ]
+
+    grids_and_solutions = zip(grids, solutions)
+
+    @pytest.fixture(params=grids_and_solutions)
+    def grid_and_solution(self, request):
+        return request.param
+
+    @pytest.fixture()
+    def grid(self, grid_and_solution):
+        grid, _ = grid_and_solution
+        return grid
 
     @pytest.fixture
-    def expected_solution_cells_off_indexes(self):
-        return set(
-            [
-                (0, 0),
-                (0, 2),
-                (0, 6),
-                (1, 5),
-                (2, 0),
-                (2, 3),
-                (3, 2),
-                (3, 5),
-                (3, 7),
-                (4, 1),
-                (4, 3),
-                (5, 0),
-                (5, 4),
-                (5, 7),
-                (6, 1),
-                (7, 4),
-                (7, 6)
-            ]
-        )
+    def expected_solution_cells_off_indexes(self, grid_and_solution):
+        _, solution = grid_and_solution
+        return set(solution)
 
     @pytest.fixture
     def cells(self, grid):
