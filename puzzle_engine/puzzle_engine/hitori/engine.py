@@ -29,7 +29,7 @@ class HitoriEngine(object):
         self._constraints = HitoriEngineConstraints(self._engine_data, self._model, self._variables)
 
     def solve(self):
-        callback_handler = HitoriEngineCallbackHandler(self._engine_data, self._variables)
+        callback_handler = HitoriEngineCallback(self._engine_data, self._variables)
 
         def unbound_callback(model, where):  # bit of a hack to appease gurobi
             return callback_handler.callback(model, where)
@@ -157,7 +157,14 @@ class NeighbouringCellsConstraint(object):
         )
 
 
-class ConnectedComponentConstraint(object):
+class ComponentConstraint(object):
+    """
+    For each possible component in the graph of the board,
+    it's either not in the solution, or one of its neighbours is on.
+
+    Note: the number of possible components is exponential, so this is
+    a lazy constraint.
+    """
     def __init__(self, cell_on):
         self._cell_on = cell_on
 
@@ -175,31 +182,53 @@ class HitoriEngineSolutionAdapter(object):
 
     def get_solution(self):
         return HitoriSolution(
-            cells_on=[cell for cell, val in self._variables.cell_on.items() if val.x > 0.5],
-            cells_off=[cell for cell, val in self._variables.cell_on.items() if val.x < 0.5]
+            cells_on=[
+                cell
+                for cell, var in self._variables.cell_on.items()
+                if gurobi_binary_variable_is_true(var)
+            ],
+            cells_off=[
+                cell
+                for cell, var in self._variables.cell_on.items()
+                if not gurobi_binary_variable_is_true(var)
+            ]
         )
 
 
-class HitoriEngineCallbackHandler(object):
+class HitoriSolution(object):
+    def __init__(self, cells_on, cells_off):
+        self.cells_on = cells_on
+        self.cells_off = cells_off
+
+
+class HitoriEngineCallback(object):
     def __init__(self, engine_data, variables):
         self._engine_data = engine_data
         self._variables = variables
 
-        self._connected_component_constraint_generator = ConnectedComponentConstraint(self._variables.cell_on)
+        self._connectivity_callback = ConnectivityCallback(self._engine_data, self._variables)
 
     def callback(self, model, where):
         if where == GRB.Callback.MIPSOL:
             cells_on = self._get_cells_on(model)
-            self._connectivity_callback(model, cells_on)
+            self._connectivity_callback.callback(model, cells_on)
 
     def _get_cells_on(self, model):
-        return set(
+        return [
             cell
             for cell, var in self._variables.cell_on.items()
-            if model.cbGetSolution(var) > 0.5
-        )
+            if gurobi_binary_variable_is_true(var, value_getter=model.cbGetSolution)
+        ]
 
-    def _connectivity_callback(self, model, cells_on):
+
+class ConnectivityCallback(object):
+    def __init__(self, engine_data, variables):
+        self._engine_data = engine_data
+        self._variables = variables
+
+        self._connected_component_constraint_generator = ComponentConstraint(self._variables.cell_on)
+
+    def callback(self, model, cells_on):
         """
         Finds the smallest connected component (if it exists)
         of the graph of the solution and adds a lazy cut to
@@ -240,6 +269,7 @@ def get_graph_from_cells_on(cells_on, cell_adjacencies):
 
 
 def get_cell_adjacencies_from_cells_on(cells_on, cell_adjacencies):
+    cells_on = set(cells_on)
     return [
         (cell_adjacency.cell_1, cell_adjacency.cell_2)
         for cell_adjacency in cell_adjacencies
@@ -250,16 +280,14 @@ def get_cell_adjacencies_from_cells_on(cells_on, cell_adjacencies):
 
 def get_neighbours_of_cells(cells, cell_neighbourhoods):
     cells = set(cells)
-    return set(
+    return [
         nbr
         for cell_neighbourhood in cell_neighbourhoods
         for nbr in cell_neighbourhood.neighbours
         if cell_neighbourhood.cell in cells and
         nbr not in cells
-    )
+    ]
 
 
-class HitoriSolution(object):
-    def __init__(self, cells_on, cells_off):
-        self.cells_on = cells_on
-        self.cells_off = cells_off
+def gurobi_binary_variable_is_true(var, value_getter=lambda var: var.x, tolerance=10**(-5)):
+    return abs(value_getter(var) - 1) < tolerance
