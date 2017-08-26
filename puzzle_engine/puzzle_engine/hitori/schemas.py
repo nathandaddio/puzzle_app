@@ -46,3 +46,16 @@ class BoardSchema(Schema):
                 raise ValidationError(
                     "{} is not within the bounds of the board of ({},{})".format(
                         cell, data['number_of_rows'], data['number_of_columns']))
+
+
+class HitoriSolutionSchema(Schema):
+    cells_on = fields.Nested(CellSchema, many=True)
+    cells_off = fields.Nested(CellSchema, many=True)
+
+
+def load_board(json_object_data):
+    return BoardSchema(strict=True).load(json_object_data).data
+
+
+def dump_solution(hitori_solution):
+    return HitoriSolutionSchema(strict=True).dump(hitori_solution).data

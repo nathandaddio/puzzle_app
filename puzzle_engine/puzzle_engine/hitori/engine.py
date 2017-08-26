@@ -14,6 +14,12 @@ from networkx import Graph, connected_components
 logger = logging.getLogger(__name__)
 
 
+def hitori_solve(engine_data):
+    engine = HitoriEngine(engine_data)
+    engine.solve()
+    return engine.get_solution()
+
+
 class HitoriEngine(object):
     def __init__(self, engine_data):
         self._engine_data = engine_data

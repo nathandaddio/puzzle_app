@@ -7,7 +7,8 @@ from marshmallow import ValidationError
 
 from puzzle_engine.hitori.schemas import (
     CellSchema,
-    BoardSchema
+    BoardSchema,
+    HitoriSolutionSchema
 )
 
 
@@ -206,3 +207,41 @@ class TestBoardSchema:
     def test_board_schema_validates(self, data):
         with pytest.raises(ValidationError):
             BoardSchema(strict=True).load(data)
+
+
+class TestHitoriSolutionSchema:
+    @pytest.fixture
+    def cells_on(self):
+        return [
+            {
+                'row_number': 1,
+                'column_number': 2,
+                'value': 2
+            },
+            {
+                'row_number': 2,
+                'column_number': 3,
+                'value': 5
+            }
+        ]
+
+    @pytest.fixture
+    def cells_off(self):
+        return [
+            {
+                'row_number': 5,
+                'column_number': 2,
+                'value': 1
+            }
+        ]
+
+    @pytest.fixture
+    def hitori_solution(self, cells_on, cells_off):
+        return {
+            'cells_on': cells_on,
+            'cells_off': cells_off
+        }
+
+    def test_hitori_solution_schema_dump(self, hitori_solution):
+        data = HitoriSolutionSchema(strict=True).dump(hitori_solution).data
+        assert data == hitori_solution
