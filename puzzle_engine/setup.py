@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 requires = [
     'gurobipy',
+    'celery==4.1.0',
     'marshmallow==2.13.4',
 ]
 

@@ -6,7 +6,7 @@ from puzzle_engine.hitori.schemas import (
 from puzzle_engine.hitori.models import EngineData
 
 
-def solve(json_obj_data):
+def solve_hitori(json_obj_data):
     board = load_board(json_obj_data)
     engine_data = EngineData(board)
     solution = hitori_solve(engine_data)

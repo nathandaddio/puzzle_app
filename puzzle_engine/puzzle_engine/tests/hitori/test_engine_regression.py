@@ -160,6 +160,11 @@ class TestHitoriEngine:
 
     @pytest.fixture
     def engine_data(self, board):
+        from puzzle_engine.hitori.schemas import BoardSchema
+        import json
+
+        with open('board.json', 'w') as board_fo:
+            json.dump(BoardSchema().dump(board).data, board_fo)
         return EngineData(board)
 
     @pytest.fixture
