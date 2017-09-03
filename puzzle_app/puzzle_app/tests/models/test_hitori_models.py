@@ -1,15 +1,23 @@
+from datetime import datetime
+
 import pytest
 
-from sqlalchemy import inspect
+from sqlalchemy import (
+    exc,
+    inspect
+)
 
 from puzzle_app.models.hitori import (
     HitoriGameBoard,
-    HitoriGameBoardCell
+    HitoriGameBoardCell,
+    HitoriSolve,
+    HITORI_SOLVE_STATUS
 )
 
 from factories import (
     HitoriGameBoardFactory,
     HitoriGameBoardCellFactory,
+    HitoriSolveFactory
 )
 
 
@@ -142,3 +150,41 @@ class TestBoardCellRelationship:
         assert inspect(board).persistent
 
         assert inspect(cell).detached
+
+
+class TestHitoriSolve:
+    @pytest.fixture
+    def started_at(self):
+        return datetime.utcnow()
+
+    @pytest.fixture
+    def hitori_solve(self, started_at, db_session):
+        solve = HitoriSolveFactory(started_at=started_at)
+        db_session.add(solve)
+        db_session.commit()
+        return solve
+
+    def test_hitori_solve_attributes(self, started_at, hitori_solve):
+        assert hitori_solve.started_at == started_at
+        assert hitori_solve.id
+        assert hitori_solve.status == HITORI_SOLVE_STATUS.RUNNING  # tasks always start off as running
+        assert hitori_solve.hitori_game_board
+
+    def test_get_hitori_solve_from_db(self, db_session, hitori_solve):
+        assert db_session.query(HitoriSolve).all() == [hitori_solve]
+
+    def test_hitori_solve_can_set_status_to_success(self, db_session, hitori_solve):
+        hitori_solve.status = HITORI_SOLVE_STATUS.SUCCESS
+
+        db_session.commit()
+
+        assert hitori_solve.status == HITORI_SOLVE_STATUS.SUCCESS
+
+    @pytest.mark.parametrize('bad_status', ["NOT A STATUS", None, "", 2])
+    def test_hitori_solve_bad_status(self, bad_status, db_session, hitori_solve):
+        hitori_solve.status = bad_status
+
+        # may raise different errors depending on the DB-API,
+        # so we go for something broad here
+        with pytest.raises(exc.SQLAlchemyError):
+            db_session.commit()

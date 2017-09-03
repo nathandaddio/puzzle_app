@@ -1,7 +1,8 @@
 from marshmallow import (
     fields,
     Schema,
-    post_dump
+    post_dump,
+    validate
 )
 
 
@@ -10,16 +11,19 @@ from marshmallow_enum import EnumField
 from puzzle_app.models import HITORI_SOLVE_STATUS
 
 
+nonnegative = validate.Range(min=0)
+
+
 class HitoriGameBoardCellSchema(Schema):
     class Meta:
         ordered = True
 
-    id = fields.Int(required=True)
+    id = fields.Int(required=True, validate=nonnegative)
 
-    row_number = fields.Int(required=True)
-    column_number = fields.Int(required=True)
+    row_number = fields.Int(required=True, validate=nonnegative)
+    column_number = fields.Int(required=True, validate=nonnegative)
 
-    value = fields.Int(required=True)
+    value = fields.Int(required=True, validate=nonnegative)
 
     included_in_solution = fields.Bool(allow_none=True)
 

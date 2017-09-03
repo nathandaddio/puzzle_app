@@ -5,7 +5,8 @@ import pytest
 
 from puzzle_app.models import (
     HitoriGameBoard,
-    HitoriGameBoardCell
+    HitoriGameBoardCell,
+    HitoriSolve
 )
 
 
@@ -29,4 +30,11 @@ class HitoriGameBoardCellFactory(factory.alchemy.SQLAlchemyModelFactory):
     value = 3
 
 
-FACTORIES = [HitoriGameBoardFactory, HitoriGameBoardCellFactory]
+class HitoriSolveFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = HitoriSolve
+
+    hitori_game_board = factory.SubFactory(HitoriGameBoardFactory)
+
+
+FACTORIES = [HitoriGameBoardFactory, HitoriGameBoardCellFactory, HitoriSolveFactory]
