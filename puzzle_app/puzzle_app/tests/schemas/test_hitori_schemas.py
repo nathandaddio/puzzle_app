@@ -65,3 +65,4 @@ class TestHitoriGameBoardCellSchema:
 
 
 class TestHitoriGameBoardSchema:
+    pass

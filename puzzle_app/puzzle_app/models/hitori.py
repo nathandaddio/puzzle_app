@@ -52,6 +52,7 @@ class HitoriGameBoardCell(Base):
 class HITORI_SOLVE_STATUS(enum.Enum):
     RUNNING = 'RUNNING'
     SUCCESS = 'SUCCESS'
+    FAILURE = 'FAILURE'
 
 
 class HitoriSolve(Base):

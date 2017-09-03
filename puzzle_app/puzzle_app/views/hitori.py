@@ -57,9 +57,13 @@ def hitori_board_get(request, board_id):
 )
 @use_kwargs({'board_id': fields.Int(required=True, location='matchdict')})
 def hitori_board_solve(request, board_id):
-    solve = HitoriSolve(hitori_game_board_id=board_id)
-    request.db_session.add(solve)
-    request.db_session.flush()
+    db_session = request.db_session
+
+    board = db_session.query(HitoriGameBoard).get(board_id)
+    solve = HitoriSolve(hitori_game_board=board)
+    db_session.add(solve)
+    db_session.flush()
+
     get_hitori_solve_chain(board_id, solve.id)()
     return {'solve_id': solve.id}
 

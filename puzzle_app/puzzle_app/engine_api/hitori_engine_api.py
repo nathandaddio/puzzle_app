@@ -48,7 +48,7 @@ def read_hitori_engine_data(hitori_engine_solution):
             db_session.query(HitoriGameBoardCell).get(cell_id).included_in_solution = False
 
 
-def update_hitori_solve_status(solve_id):
+def update_hitori_solve_status(solve_id, status):
     with transaction.manager:
         db_session = db_session_maker()
-        db_session.query(HitoriSolve).get(solve_id).status = HITORI_SOLVE_STATUS.SUCCESS
+        db_session.query(HitoriSolve).get(solve_id).status = HITORI_SOLVE_STATUS[status]
