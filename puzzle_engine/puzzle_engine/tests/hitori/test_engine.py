@@ -7,9 +7,11 @@ from puzzle_engine.hitori.engine import (
     IncompatibleCellsConstraint,
     NeighbouringCellsConstraint,
     ComponentConstraint,
+    HitoriSolution,
     get_cell_adjacencies_from_cells_on,
     get_neighbours_of_cells,
-    gurobi_binary_variable_is_true
+    gurobi_binary_variable_is_true,
+    HitoriEngineSolutionAdapter
 )
 
 
@@ -22,8 +24,7 @@ def patch_quicksum_with_sum():
     but we want an actual number
     """
     patcher = mock.patch('puzzle_engine.hitori.engine.quicksum', new=sum)
-    patcher.start()
-    yield
+    yield patcher.start()
     patcher.stop()
 
 
@@ -270,3 +271,76 @@ class TestGurobiBinaryVariableIsTrue:
         gurobi_binary_variable_is_true(var, value_getter)
 
         value_getter.assert_called_once_with(var)
+
+
+class TestHitoriSolution:
+    @pytest.fixture
+    def data(self):
+        return {
+            'cells_on': [mock.Mock(), mock.Mock()],
+            'cells_off': [mock.Mock()],
+            'board': mock.Mock()
+        }
+
+    @pytest.fixture
+    def hitori_solution(self, data):
+        return HitoriSolution(**data)
+
+    def test_hitori_solution_attrs(self, data, hitori_solution):
+        for attr, value in data.items():
+            assert getattr(hitori_solution, attr) == value
+
+
+class TestHitoriEngineSolutionAdapter:
+    @pytest.fixture
+    def model(self):
+        return mock.Mock()
+
+    @pytest.fixture
+    def cell_on(self, cells):  # mocking out gurobi variables
+        return {
+            cells[0]: mock.Mock(x=0),
+            cells[1]: mock.Mock(x=1),
+            cells[2]: mock.Mock(x=1),
+            cells[3]: mock.Mock(x=0)
+        }
+
+    @pytest.fixture
+    def variables(self, cell_on):
+        return mock.Mock(
+            cell_on=cell_on,
+            spec=['cell_on']
+        )
+
+    @pytest.fixture
+    def board(self):
+        return mock.Mock()
+
+    @pytest.fixture
+    def engine_data(self, board):
+        return mock.Mock(board=board)
+
+    @pytest.fixture
+    def expected(self, cells, board):
+        return {
+            'cells_on': [cells[1], cells[2]],
+            'cells_off': [cells[0], cells[3]],
+            'board': board
+        }
+
+    @pytest.fixture
+    def hitori_engine_solution_adapter(self, model, variables, engine_data):
+        return HitoriEngineSolutionAdapter(
+            model=model,
+            variables=variables,
+            engine_data=engine_data
+        )
+
+    @pytest.fixture
+    def hitori_engine_solution(self, hitori_engine_solution_adapter):
+        return hitori_engine_solution_adapter.get_solution()
+
+    def test_hitori_engine_solution_adapter_gets_expected_solution(self, hitori_engine_solution, expected):
+        assert set(hitori_engine_solution.cells_on) == set(expected['cells_on'])
+        assert set(hitori_engine_solution.cells_off) == set(expected['cells_off'])
+        assert hitori_engine_solution.board == expected['board']

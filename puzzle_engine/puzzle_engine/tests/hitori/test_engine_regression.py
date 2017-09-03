@@ -177,6 +177,14 @@ class TestHitoriEngine:
         engine.solve()
         return engine.get_solution()
 
+    def test_cells_are_either_off_xor_on(self, cells, solution, expected_solution_cells_off_indexes):
+        cell_indexes = set((cell.row_number, cell.column_number) for cell in cells)
+        cells_off_indexes = set((cell.row_number, cell.column_number) for cell in solution.cells_off)
+        cells_on_indexes = set((cell.row_number, cell.column_number) for cell in solution.cells_on)
+
+        assert not (cells_on_indexes.intersection(cells_off_indexes))
+        assert cells_on_indexes.union(cells_off_indexes) == cell_indexes
+
     def test_expected_solution(self, solution, expected_solution_cells_off_indexes):
         cells_off_indexes = [(cell.row_number, cell.column_number) for cell in solution.cells_off]
 
