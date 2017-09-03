@@ -10,8 +10,10 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'alembic',
+    'celery==4.1.0',
     'factory_boy',
     'marshmallow==2.13.4',
+    'marshmallow_enum==1.4.1',
     'plaster_pastedeploy',
     'pyramid >= 1.9a',
     'pyramid_debugtoolbar',

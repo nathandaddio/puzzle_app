@@ -5,7 +5,15 @@ from marshmallow import (
 )
 
 
+from marshmallow_enum import EnumField
+
+from puzzle_app.models import HITORI_SOLVE_STATUS
+
+
 class HitoriGameBoardCellSchema(Schema):
+    class Meta:
+        ordered = True
+
     id = fields.Int(required=True)
 
     row_number = fields.Int(required=True)
@@ -17,6 +25,9 @@ class HitoriGameBoardCellSchema(Schema):
 
 
 class HitoriGameBoardSchema(Schema):
+    class Meta:
+        ordered = True
+
     id = fields.Int(required=True)
 
     number_of_rows = fields.Int(required=True)
@@ -30,3 +41,14 @@ class HitoriGameBoardSchema(Schema):
     def order_cells(self, data):
         data['cells'] = sorted(data['cells'], key=lambda cell: (cell['row_number'], cell['column_number']))
         return data
+
+
+class HitoriSolveSchema(Schema):
+    class Meta:
+        ordered = True
+
+    id = fields.Int(required=True)
+
+    started_at = fields.DateTime(required=True)
+    status = EnumField(HITORI_SOLVE_STATUS, required=True)
+    hitori_game_board_id = fields.Int(required=True)

@@ -6,9 +6,12 @@ from webargs.pyramidparser import use_kwargs
 from marshmallow import fields
 
 
-from puzzle_app.models import HitoriGameBoard
+from puzzle_app.models import HitoriGameBoard, HitoriSolve
 
-from puzzle_app.schemas.hitori import HitoriGameBoardSchema
+from puzzle_app.schemas.hitori import HitoriGameBoardSchema, HitoriSolveSchema
+
+
+from puzzle_app.jobs import get_hitori_solve_chain, hitori_solve, hitori_engine_input
 
 
 @view_config(
@@ -45,3 +48,29 @@ def hitori_board_get(request, board_id):
     schema = HitoriGameBoardSchema(strict=True)
 
     return schema.dump(board).data
+
+
+@view_config(
+    route_name='hitori_board_solve',
+    request_method='GET',
+    renderer='json'
+)
+@use_kwargs({'board_id': fields.Int(required=True, location='matchdict')})
+def hitori_board_solve(request, board_id):
+    solve = HitoriSolve(hitori_game_board_id=board_id)
+    request.db_session.add(solve)
+    request.db_session.flush()
+    get_hitori_solve_chain(board_id, solve.id)()
+    return {'solve_id': solve.id}
+
+
+@view_config(
+    route_name='hitori_solves',
+    request_method='GET',
+    renderer='json'
+)
+def hitori_solves_get(request):
+    db = request.db_session
+    solves = db.query(HitoriSolve).all()
+    schema = HitoriSolveSchema(strict=True, many=True)
+    return schema.dump(solves).data

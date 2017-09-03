@@ -1,11 +1,13 @@
 from sqlalchemy import engine_from_config
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.orm import configure_mappers
 import zope.sqlalchemy
 
 from puzzle_app.models.hitori import (
     HitoriGameBoard,
     HitoriGameBoardCell,
+    HitoriSolve,
+    HITORI_SOLVE_STATUS
 )
 
 # run configure_mappers after defining all of the models to ensure
@@ -50,6 +52,9 @@ def get_tm_session(session_factory, transaction_manager):
     return dbsession
 
 
+db_session_maker = scoped_session(sessionmaker(extension=zope.sqlalchemy.ZopeTransactionExtension()))
+
+
 def includeme(config):
     """
     Initialize the model for a Pyramid app.
@@ -65,8 +70,8 @@ def includeme(config):
 
     # use pyramid_retry to retry a request when transient exceptions occur
     config.include('pyramid_retry')
-
-    session_factory = get_session_factory(get_engine(settings))
+    engine = get_engine(settings)
+    session_factory = get_session_factory(engine)
     config.registry['dbsession_factory'] = session_factory
 
     # make request.dbsession available for use in Pyramid
@@ -76,3 +81,5 @@ def includeme(config):
         'db_session',
         reify=True
     )
+
+    db_session_maker.configure(bind=engine)
