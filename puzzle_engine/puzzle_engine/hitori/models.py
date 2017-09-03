@@ -3,14 +3,16 @@ from itertools import combinations
 
 
 class Board(object):
-    def __init__(self, number_of_rows, number_of_columns, cells):
+    def __init__(self, id, number_of_rows, number_of_columns, cells):
+        self.id = id
         self.number_of_rows = number_of_rows
         self.number_of_columns = number_of_columns
         self.cells = cells
 
 
 class Cell(object):
-    def __init__(self, row_number, column_number, value):
+    def __init__(self, id, row_number, column_number, value):
+        self.id = id
         self.row_number = row_number
         self.column_number = column_number
         self.value = value

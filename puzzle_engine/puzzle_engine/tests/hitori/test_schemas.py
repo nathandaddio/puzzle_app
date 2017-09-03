@@ -16,6 +16,7 @@ class TestCellSchema:
     @pytest.fixture
     def data(self):
         return {
+            'id': 1,
             'row_number': 1,
             'column_number': 2,
             'value': 5
@@ -35,16 +36,19 @@ class TestCellSchema:
 
     bad_data = [
         {
+            'id': 1,
             'row_number': 3,
             'column_number': -1,
             'value': 5
         },
         {
+            'id': 1,
             'row_number': -3,
             'column_number': 5,
             'value': 5
         },
         {
+            'id': 1,
             'row_number': -3,
             'column_number': -5,
             'value': 2
@@ -61,10 +65,12 @@ class TestBoardSchema:
     @pytest.fixture
     def data(self):
         return {
+            'id': 1,
             'number_of_rows': 5,
             'number_of_columns': 5,
             'cells': [
                 {
+                    'id': 1,
                     'row_number': 1,
                     'column_number': 2,
                     'value': 3
@@ -98,10 +104,12 @@ class TestBoardSchema:
 
     bad_data = [
         {
+            'id': 1,
             'number_of_rows': -5,
             'number_of_columns': 5,
             'cells': [
                 {
+                    'id': 1,
                     'row_number': 1,
                     'column_number': 2,
                     'value': 3
@@ -109,10 +117,12 @@ class TestBoardSchema:
             ]
         },
         {
+            'id': 1,
             'number_of_rows': 5,
             'number_of_columns': -5,
             'cells': [
                 {
+                    'id': 1,
                     'row_number': 1,
                     'column_number': 2,
                     'value': 3
@@ -120,10 +130,12 @@ class TestBoardSchema:
             ]
         },
         {
+            'id': 1,
             'number_of_rows': -5,
             'number_of_columns': -5,
             'cells': [
                 {
+                    'id': 1,
                     'row_number': 1,
                     'column_number': 2,
                     'value': 3
@@ -131,10 +143,12 @@ class TestBoardSchema:
             ]
         },
         {
+            'id': 1,
             'number_of_rows': 5,
             'number_of_columns': 5,
             'cells': [
                 {
+                    'id': 1,
                     'row_number': 10,
                     'column_number': 2,
                     'value': 3
@@ -142,10 +156,12 @@ class TestBoardSchema:
             ]
         },
         {
+            'id': 1,
             'number_of_rows': 5,
             'number_of_columns': 5,
             'cells': [
                 {
+                    'id': 2,
                     'row_number': 3,
                     'column_number': 12,
                     'value': 3
@@ -153,10 +169,12 @@ class TestBoardSchema:
             ]
         },
         {
+            'id': 1,
             'number_of_rows': 5,
             'number_of_columns': 5,
             'cells': [
                 {
+                    'id': 2,
                     'row_number': 10,
                     'column_number': 12,
                     'value': 3
@@ -164,15 +182,18 @@ class TestBoardSchema:
             ]
         },
         {
+            'id': 1,
             'number_of_rows': 5,
             'number_of_columns': 5,
             'cells': [
                 {
+                    'id': 3,
                     'row_number': 1,
                     'column_number': 6,
                     'value': 3
                 },
                 {
+                    'id': 5,
                     'row_number': 3,
                     'column_number': 2,
                     'value': 3
@@ -180,10 +201,12 @@ class TestBoardSchema:
             ]
         },
         {
+            'id': 1,
             'number_of_rows': 5,
             'number_of_columns': 5,
             'cells': [
                 {
+                    'id': 1,
                     'row_number': 5,
                     'column_number': 3,
                     'value': 3
@@ -191,10 +214,12 @@ class TestBoardSchema:
             ]
         },
         {
+            'id': 1,
             'number_of_rows': 5,
             'number_of_columns': 5,
             'cells': [
                 {
+                    'id': 2,
                     'row_number': 3,
                     'column_number': 5,
                     'value': 3
@@ -214,14 +239,16 @@ class TestHitoriSolutionSchema:
     def cells_on(self):
         return [
             {
+                'id': 3,
                 'row_number': 1,
                 'column_number': 2,
-                'value': 2
+                'value': 3
             },
             {
-                'row_number': 2,
-                'column_number': 3,
-                'value': 5
+                'id': 5,
+                'row_number': 3,
+                'column_number': 2,
+                'value': 3
             }
         ]
 
@@ -229,19 +256,33 @@ class TestHitoriSolutionSchema:
     def cells_off(self):
         return [
             {
-                'row_number': 5,
-                'column_number': 2,
-                'value': 1
+                'id': 3,
+                'row_number': 1,
+                'column_number': 6,
+                'value': 3
             }
         ]
 
     @pytest.fixture
-    def hitori_solution(self, cells_on, cells_off):
+    def board(self):
+        return {'id': 2, 'cells': []}
+
+    @pytest.fixture
+    def hitori_solution(self, cells_on, cells_off, board):
         return {
             'cells_on': cells_on,
-            'cells_off': cells_off
+            'cells_off': cells_off,
+            'board': board
         }
 
-    def test_hitori_solution_schema_dump(self, hitori_solution):
+    @pytest.fixture
+    def expected_dumped_hitori_solution(self, cells_on, cells_off, board):
+        return {
+            'cells_on': [cell['id'] for cell in cells_on],
+            'cells_off': [cell['id'] for cell in cells_off],
+            'board': board['id']
+        }
+
+    def test_hitori_solution_schema_dump(self, hitori_solution, expected_dumped_hitori_solution):
         data = HitoriSolutionSchema(strict=True).dump(hitori_solution).data
-        assert data == hitori_solution
+        assert data == expected_dumped_hitori_solution

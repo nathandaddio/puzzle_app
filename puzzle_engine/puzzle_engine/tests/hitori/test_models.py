@@ -125,6 +125,10 @@ def get_mock_cells_from_cell_values(cell_values):
 
 class TestBoard:
     @pytest.fixture
+    def id(self):
+        return 1
+
+    @pytest.fixture
     def number_of_rows(self):
         return 3
 
@@ -141,8 +145,9 @@ class TestBoard:
         return get_mock_cells_from_cell_values(values)
 
     @pytest.fixture
-    def data(self, number_of_rows, number_of_columns, cells):
+    def data(self, id, number_of_rows, number_of_columns, cells):
         return {
+            'id': id,
             'number_of_rows': number_of_rows,
             'number_of_columns': number_of_columns,
             'cells': cells
@@ -158,6 +163,10 @@ class TestBoard:
 
 class TestCell:
     @pytest.fixture
+    def id(self):
+        return 1
+
+    @pytest.fixture
     def row_number(self):
         return 1
 
@@ -170,8 +179,9 @@ class TestCell:
         return 5
 
     @pytest.fixture
-    def data(self, row_number, column_number, value):
+    def data(self, id, row_number, column_number, value):
         return {
+            'id': id,
             'row_number': row_number,
             'column_number': column_number,
             'value': value

@@ -145,7 +145,7 @@ class TestHitoriEngine:
     @pytest.fixture
     def cells(self, grid):
         return [
-            Cell(i, j, val)
+            Cell(1, i, j, val)
             for i, row in enumerate(grid)
             for j, val in enumerate(row)
         ]
@@ -153,6 +153,7 @@ class TestHitoriEngine:
     @pytest.fixture
     def board(self, grid, cells):
         return Board(
+            id=1,
             number_of_rows=len(grid),
             number_of_columns=len(grid[0]),
             cells=cells

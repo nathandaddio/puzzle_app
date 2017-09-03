@@ -43,7 +43,7 @@ class HitoriEngine(object):
         self._model.optimize(unbound_callback)
 
     def get_solution(self):
-        solution_adapter = HitoriEngineSolutionAdapter(self._model, self._variables)
+        solution_adapter = HitoriEngineSolutionAdapter(self._engine_data, self._model, self._variables)
         return solution_adapter.get_solution()
 
 
@@ -182,9 +182,10 @@ class ComponentConstraint(object):
 
 
 class HitoriEngineSolutionAdapter(object):
-    def __init__(self, model, variables):
+    def __init__(self, engine_data, model, variables):
         self._model = model
         self._variables = variables
+        self._engine_data = engine_data
 
     def get_solution(self):
         return HitoriSolution(
@@ -197,14 +198,16 @@ class HitoriEngineSolutionAdapter(object):
                 cell
                 for cell, var in self._variables.cell_on.items()
                 if not gurobi_binary_variable_is_true(var)
-            ]
+            ],
+            board=self._engine_data.board
         )
 
 
 class HitoriSolution(object):
-    def __init__(self, cells_on, cells_off):
+    def __init__(self, cells_on, cells_off, board):
         self.cells_on = cells_on
         self.cells_off = cells_off
+        self.board = board
 
 
 class HitoriEngineCallback(object):

@@ -17,6 +17,7 @@ nonnegative = validate.Range(min=0)
 
 
 class CellSchema(Schema):
+    id = fields.Int(required=True)
     row_number = fields.Int(required=True, validate=nonnegative)
     column_number = fields.Int(required=True, validate=nonnegative)
     value = fields.Int(required=True)
@@ -27,6 +28,7 @@ class CellSchema(Schema):
 
 
 class BoardSchema(Schema):
+    id = fields.Int(required=True)
     number_of_rows = fields.Int(required=True, validate=nonnegative)
     number_of_columns = fields.Int(required=True, validate=nonnegative)
     cells = fields.Nested(CellSchema, many=True, required=True)
@@ -49,8 +51,9 @@ class BoardSchema(Schema):
 
 
 class HitoriSolutionSchema(Schema):
-    cells_on = fields.Nested(CellSchema, many=True)
-    cells_off = fields.Nested(CellSchema, many=True)
+    cells_on = fields.Nested(CellSchema, many=True, only='id')
+    cells_off = fields.Nested(CellSchema, many=True, only='id')
+    board = fields.Nested(BoardSchema, only='id')
 
 
 def load_board(json_object_data):
