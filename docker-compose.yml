@@ -1,0 +1,24 @@
+version: '3'
+services:
+
+  web:
+    build: ./puzzle_app
+    ports:
+     - "6543:6543"
+    volumes:
+     - ./puzzle_app:/code
+    command: pserve development.ini
+    depends_on:
+     - db
+
+  db:
+    image: postgres
+    environment:
+     POSTGRES_PASSWORD: password
+     POSTGRES_DB: puzzle_app
+
+  initialise-db:
+    build: ./puzzle_app
+    command: python puzzle_app/scripts/initializedb.py development.ini
+    depends_on:
+     - db
