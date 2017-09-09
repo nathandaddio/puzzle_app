@@ -19,4 +19,4 @@ CELERY_ROUTES = {
 
 CELERY_RESULT_BACKEND = 'rpc'
 
-BROKER_URL = 'amqp://guest@localhost/puzzle_app'
+BROKER_URL = 'amqp://guest:guest@localhost:5673/puzzle_app'
