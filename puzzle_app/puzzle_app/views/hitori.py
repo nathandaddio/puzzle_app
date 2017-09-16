@@ -22,7 +22,7 @@ from puzzle_app.jobs import get_hitori_solve_chain, hitori_solve, hitori_engine_
 def hitori_boards_get(request):
     db = request.db_session
 
-    boards = db.query(HitoriGameBoard).all()
+    boards = db.query(HitoriGameBoard).order_by(HitoriGameBoard.id.desc()).all()
 
     schema = HitoriGameBoardSchema(strict=True, many=True)
 
@@ -78,3 +78,16 @@ def hitori_solves_get(request):
     solves = db.query(HitoriSolve).all()
     schema = HitoriSolveSchema(strict=True, many=True)
     return schema.dump(solves).data
+
+
+@view_config(
+    route_name='hitori_solve',
+    request_method='GET',
+    renderer='json'
+)
+@use_kwargs({'solve_id': fields.Int(required=True, location='matchdict')})
+def hitori_solve_get(request, solve_id):
+    db = request.db_session
+    solve = db.query(HitoriSolve).get(solve_id)
+    schema = HitoriSolveSchema(strict=True)
+    return schema.dump(solve).data

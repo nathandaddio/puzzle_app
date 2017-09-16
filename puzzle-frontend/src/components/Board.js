@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 import React from 'react';
 
 
@@ -6,6 +8,7 @@ class Board extends React.Component {
         return (
             <Cell
                 value={cell.value}
+                inSolution={cell.included_in_solution}
                 key={cell.id}
             />
         );
@@ -19,20 +22,39 @@ class Board extends React.Component {
         );
     }
 
-    renderRows() {
+    renderRows(cells) {
         return (
             <div className='board-rows'>
-                {this.props.cells.map((row, index) => this.renderRow(row, index))}
+                {cells.map((row, index) => this.renderRow(row, index))}
             </div>
         );
     }
 
 
     render () {
+        var matrix = toMatrix(this.props.cells, this.props.columns);
         return (
-            <form>
-                {this.renderRows()}
+          <div className='board'>
+            <div className='board-name'>
+              {this.props.name}
+            </div>
+
+            <form onSubmit={(e) => {e.preventDefault(); this.props.solve(); }}>
+                {this.renderRows(matrix)}
+                <SolveButton/>
             </form>
+          </div>
+        );
+    }
+}
+
+
+class SolveButton extends React.Component {
+    render () {
+        return (
+          <div className='Solve-button'>
+            <button onClick={this.props.onClick}>Solve</button>
+          </div>
         );
     }
 }
@@ -41,10 +63,54 @@ class Board extends React.Component {
 class Cell extends React.Component {
     render () {
         return (
-            <input type='text' className='board-cell' defaultValue={this.props.value} />
+            <input
+              type='text'
+              className={(this.props.inSolution || this.props.inSolution === null) ? 'board-cell' : 'board-cell-not-in-solution'}
+              defaultValue={this.props.value}
+            />
         );
     }
 }
 
+
+const toMatrix = (arr, width) =>
+    arr.reduce((rows, key, index) => (index % width == 0 ? rows.push([key])
+      : rows[rows.length-1].push(key)) && rows, []);
+
+Board.propTypes = {
+    cells: PropTypes.arrayOf(
+        PropTypes.shape({
+            value: PropTypes.number.isRequired,
+            id: PropTypes.number.isRequired
+        })
+    ).isRequired,
+    columns: PropTypes.number.isRequired,
+    rows: PropTypes.number.isRequired
+}
+
+
+Cell.propTypes = {
+    value: PropTypes.number.isRequired,
+    inSolution: PropTypes.bool
+}
+
+// const mapStateToProps = state => {
+//   return {
+//     todos: getVisibleTodos(state.todos, state.visibilityFilter)
+//   }
+// }
+
+// const mapDispatchToProps = dispatch => {
+//   return {
+//     onTodoClick: id => {
+//       dispatch(toggleTodo(id))
+//     }
+//   }
+// }
+
+// const VisibleTodoList = connect(
+//   mapStateToProps,
+//   mapDispatchToProps
+// )(TodoList)
 
 export { Board };

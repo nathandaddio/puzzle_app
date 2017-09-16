@@ -2,30 +2,41 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { Board } from './components/Board';
+import { connect } from 'react-redux'
+import { solveBoard } from './actions'
+
 
 class App extends Component {
-  render() {
-    var cells = [
-      [
-        {id: 0, value: 0},
-        {id: 1, value: 5},
-        {id: 2, value: 3}
-      ],
-      [
-        {id: 3, value: 1},
-        {id: 4, value: 2},
-        {id: 5, value: 3}
-      ]
-    ];
-
+  renderBoard(board) {
     return (
-      <div className="board">
         <Board
-          cells={cells}
+          name={board.id}
+          cells={board.cells}
+          rows={board.number_of_rows}
+          columns={board.number_of_columns}
+          key={board.id}
+          solve={() => this.props.solveBoardClick(board.id)}
         />
-      </div>
     );
+  }
+
+  render() {
+    return (
+      <div className="boards">
+        {this.props.boards.map((board) => this.renderBoard(board))}
+      </div>
+    )
   }
 }
 
-export default App;
+function mapStateToProps(state) {
+  return state
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    solveBoardClick: id => dispatch(solveBoard(id))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)

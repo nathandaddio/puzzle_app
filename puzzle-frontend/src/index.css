@@ -3,6 +3,10 @@ body {
   margin: 20px;
 }
 
+.board {
+  padding: 10px;
+}
+
 .board-row:after {
   clear: both;
   content: "";
@@ -22,4 +26,24 @@ body {
   padding: 0;
   text-align: center;
   width: 34px;
+}
+
+.board-cell-not-in-solution {
+  color: #fff;
+  background: #000;
+  border: 1px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+}
+
+.board-name {
+  font-size: 40px;
 }
