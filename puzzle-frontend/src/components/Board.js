@@ -10,6 +10,7 @@ class Board extends React.Component {
                 value={cell.value}
                 inSolution={cell.included_in_solution}
                 key={cell.id}
+                handleInputChange={event => this.props.updateCellValue({id: cell.id, value: event.target.value})}
             />
         );
     }
@@ -43,6 +44,10 @@ class Board extends React.Component {
                 {this.renderRows(matrix)}
                 <SolveButton/>
             </form>
+
+            <form onSubmit={(e) => {e.preventDefault(); this.props.clone(); }}>
+                <CloneButton/>
+            </form>
           </div>
         );
     }
@@ -60,6 +65,17 @@ class SolveButton extends React.Component {
 }
 
 
+class CloneButton extends React.Component {
+    render () {
+        return (
+          <div className='Clone-button'>
+            <button onClick={this.props.onClick}>Clone</button>
+          </div>
+        );
+    }
+}
+
+
 class Cell extends React.Component {
     render () {
         return (
@@ -67,8 +83,62 @@ class Cell extends React.Component {
               type='text'
               className={(this.props.inSolution || this.props.inSolution === null) ? 'board-cell' : 'board-cell-not-in-solution'}
               defaultValue={this.props.value}
+              onChange={this.props.handleInputChange}
             />
         );
+    }
+}
+
+
+class NewBoardForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            numberOfRows: 9,
+            numberOfColumns: 9
+        }
+    }
+    render () {
+        return (
+            <div className='New-board-form'>
+                Make new board
+                <form onSubmit={
+                    (e) => {
+                        e.preventDefault();
+                        this.props.newBoard({numberOfRows: this.state.numberOfRows, numberOfColumns: this.state.numberOfColumns});
+                    }}>
+                    <div>
+                        <label>
+                        Number of rows:
+                            <input
+                              type='text'
+                              name='numberOfRows'
+                              defaultValue={this.state.numberOfRows}
+                              className='new-board-input'
+                              onChange={(e) => this.setState({numberOfRows: e.target.value})}
+                              // value={this.state.numberOfRows}
+                            />
+                        </label>
+                    </div>
+
+                    <div>
+                        <label>
+                        Number of columns:
+                            <input
+                              type='text'
+                              name='numberOfColumns'
+                              defaultValue={this.state.numberOfColumns}
+                              className='new-board-input'
+                              onChange={(e) => this.setState({numberOfColumns: e.target.value})}
+                              // value={this.state.numberOfColumns}
+                            />
+                        </label>
+                    </div>
+
+                    <button>Make new board</button>
+                </form>
+            </div>
+        )
     }
 }
 
@@ -80,7 +150,7 @@ const toMatrix = (arr, width) =>
 Board.propTypes = {
     cells: PropTypes.arrayOf(
         PropTypes.shape({
-            value: PropTypes.number.isRequired,
+            value: PropTypes.number,
             id: PropTypes.number.isRequired
         })
     ).isRequired,
@@ -90,7 +160,7 @@ Board.propTypes = {
 
 
 Cell.propTypes = {
-    value: PropTypes.number.isRequired,
+    value: PropTypes.number,
     inSolution: PropTypes.bool
 }
 
@@ -113,4 +183,4 @@ Cell.propTypes = {
 //   mapDispatchToProps
 // )(TodoList)
 
-export { Board };
+export { Board, NewBoardForm };

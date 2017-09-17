@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Board } from './components/Board';
+import { Board, NewBoardForm } from './components/Board';
 import { connect } from 'react-redux'
-import { solveBoard } from './actions'
+import { solveBoard, cloneBoard, updateCellValue, makeNewBoard } from './actions'
 
 
 class App extends Component {
@@ -16,14 +16,19 @@ class App extends Component {
           columns={board.number_of_columns}
           key={board.id}
           solve={() => this.props.solveBoardClick(board.id)}
+          clone={() => this.props.cloneBoardClick(board.id)}
+          updateCellValue={this.props.updateCellValueOnChange}
         />
     );
   }
 
   render() {
     return (
-      <div className="boards">
-        {this.props.boards.map((board) => this.renderBoard(board))}
+      <div className="app">
+        <NewBoardForm newBoard={this.props.newBoard} />
+        <div className="boards">
+          {this.props.boards.map((board) => this.renderBoard(board))}
+        </div>
       </div>
     )
   }
@@ -35,7 +40,10 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = dispatch => {
   return {
-    solveBoardClick: id => dispatch(solveBoard(id))
+    solveBoardClick: id => dispatch(solveBoard(id)),
+    cloneBoardClick: id => dispatch(cloneBoard(id)),
+    updateCellValueOnChange: payload => dispatch(updateCellValue(payload)),
+    newBoard: payload => dispatch(makeNewBoard(payload))
   }
 }
 

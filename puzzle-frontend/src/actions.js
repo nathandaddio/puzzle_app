@@ -42,6 +42,48 @@ export function solveBoard(id) {
   }
 }
 
+
+export function cloneBoard(id) {
+  return function(dispatch) {
+    return fetch(`http://localhost:6543/hitori_boards/${id}/clone`, {method: "POST"})
+      .then(
+        response => response.json()
+      )
+      .then(
+        response => dispatch(fetchBoards())
+      )
+  }
+}
+
+
+export function updateCellValue(payload) {
+  return function (dispatch) {
+    return fetch(`http://localhost:6543/hitori_cells/${payload.id}/value`, {method: "POST", body: JSON.stringify({value: payload.value})})
+      .then(
+          response => response.json(),
+          error => console.log("Uh oh")
+      )
+      .then(
+          json => dispatch(fetchBoards())
+      )
+  }
+}
+
+
+export function makeNewBoard(payload) {
+  console.log("Make new board")
+  console.log(payload);
+  return function(dispatch) {
+    return fetch(
+        `http://localhost:6543/hitori_boards`,
+        {
+          method: "POST",
+          body: JSON.stringify({number_of_rows: payload.numberOfRows, number_of_columns: payload.numberOfColumns})
+        })
+      .then(response => dispatch(fetchBoards()))
+  }
+}
+
 var sleep = time => new Promise(resolve => setTimeout(resolve, time))
 
 var poll = (promiseFn, time) => promiseFn().then(

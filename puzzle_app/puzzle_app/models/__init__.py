@@ -7,7 +7,8 @@ from puzzle_app.models.hitori import (
     HitoriGameBoard,
     HitoriGameBoardCell,
     HitoriSolve,
-    HITORI_SOLVE_STATUS
+    HITORI_SOLVE_STATUS,
+    clone_hitori_game_board
 )
 
 # run configure_mappers after defining all of the models to ensure

@@ -5,5 +5,7 @@ def includeme(config):
     config.add_route('hitori_boards', r'/hitori_boards')
     config.add_route('hitori_board', r'/hitori_boards/{board_id:\d+}')
     config.add_route('hitori_board_solve', r'/hitori_boards/{board_id:\d+}/solve')
+    config.add_route('hitori_board_clone', r'/hitori_boards/{board_id:\d+}/clone')
     config.add_route('hitori_solves', r'/hitori_solves')
     config.add_route('hitori_solve', r'/hitori_solves/{solve_id:\d+}')
+    config.add_route('hitori_cell_value', r'/hitori_cells/{cell_id:\d+}/value')

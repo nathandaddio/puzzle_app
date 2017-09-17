@@ -44,9 +44,31 @@ class HitoriGameBoardCell(Base):
 
     row_number = Column(Integer, nullable=False)
     column_number = Column(Integer, nullable=False)
-    value = Column(Integer, nullable=False)
+    value = Column(Integer)
 
     included_in_solution = Column(Boolean(name="included_in_solution"))  # had to name this due to some SQLAlchemy bug
+
+
+def clone_hitori_game_board(db_session, board):
+    new_board = HitoriGameBoard(
+        number_of_rows=board.number_of_rows,
+        number_of_columns=board.number_of_columns
+    )
+
+    new_cells = [
+        HitoriGameBoardCell(
+            hitori_game_board=new_board,
+            row_number=cell.row_number,
+            column_number=cell.column_number,
+            value=cell.value
+        )
+        for cell in board.cells
+    ]
+
+    db_session.add(new_board)
+    db_session.add_all(new_cells)
+
+    return new_board
 
 
 class HITORI_SOLVE_STATUS(enum.Enum):

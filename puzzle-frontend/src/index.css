@@ -47,3 +47,7 @@ body {
 .board-name {
   font-size: 40px;
 }
+
+.new-board-input {
+  width: 34px;
+}

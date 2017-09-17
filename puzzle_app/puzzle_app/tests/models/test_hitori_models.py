@@ -8,6 +8,7 @@ from sqlalchemy import (
 )
 
 from puzzle_app.models.hitori import (
+    clone_hitori_game_board,
     HitoriGameBoard,
     HitoriGameBoardCell,
     HitoriSolve,
@@ -188,3 +189,34 @@ class TestHitoriSolve:
         # so we go for something broad here
         with pytest.raises(exc.SQLAlchemyError):
             db_session.commit()
+
+
+class TestCloneHitoriGameBoard:
+    @pytest.fixture
+    def board(self, db_session):
+        _board = HitoriGameBoardFactory()
+        db_session.add(_board)
+        db_session.commit()
+        return _board
+
+    @pytest.fixture
+    def cells(self, board, db_session):
+        _cells = [HitoriGameBoardCellFactory(hitori_game_board=board) for _ in range(10)]
+        db_session.add_all(_cells)
+        db_session.commit()
+        return _cells
+
+    def test_clone_hitori_game_board(self, db_session, board, cells):
+        new_board = clone_hitori_game_board(db_session, board)
+
+        attributes_to_check = ['number_of_rows', 'number_of_columns']
+
+        for attr in attributes_to_check:
+            assert getattr(new_board, attr) == getattr(board, attr)
+
+        new_cells = new_board.cells
+
+        assert (
+            set((cell.row_number, cell.column_number, cell.value) for cell in cells) ==
+            set((cell.row_number, cell.column_number, cell.value) for cell in new_cells)
+        )

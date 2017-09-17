@@ -32,7 +32,7 @@ class HitoriGameBoardSchema(Schema):
     class Meta:
         ordered = True
 
-    id = fields.Int(required=True)
+    id = fields.Int()
 
     number_of_rows = fields.Int(required=True)
     number_of_columns = fields.Int(required=True)

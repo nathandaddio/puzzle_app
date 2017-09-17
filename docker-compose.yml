@@ -7,7 +7,7 @@ services:
      - "6543:6543"
     volumes:
      - ./puzzle_app:/code
-    command: pserve development.ini
+    command: pserve --reload development.ini
     depends_on:
      - db
 
@@ -20,6 +20,8 @@ services:
   initialise-db:
     build: ./puzzle_app
     command: python puzzle_app/scripts/initializedb.py development.ini
+    volumes:
+     - ./puzzle_app:/code
     depends_on:
      - db
 

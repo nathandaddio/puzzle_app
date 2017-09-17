@@ -6,9 +6,9 @@ from webargs.pyramidparser import use_kwargs
 from marshmallow import fields
 
 
-from puzzle_app.models import HitoriGameBoard, HitoriSolve
+from puzzle_app.models import HitoriGameBoard, HitoriSolve, clone_hitori_game_board, HitoriGameBoardCell
 
-from puzzle_app.schemas.hitori import HitoriGameBoardSchema, HitoriSolveSchema
+from puzzle_app.schemas.hitori import HitoriGameBoardSchema, HitoriSolveSchema, HitoriGameBoardCellSchema
 
 
 from puzzle_app.jobs import get_hitori_solve_chain, hitori_solve, hitori_engine_input
@@ -51,6 +51,54 @@ def hitori_board_get(request, board_id):
 
 
 @view_config(
+    route_name='hitori_boards',
+    request_method='POST',
+    renderer='json'
+)
+def hitori_board_post(request):
+    db_session = request.db_session
+
+    json_data = request.json_body
+
+    json_data['cells'] = []
+
+    data = HitoriGameBoardSchema(strict=True).load(json_data).data
+
+    board = HitoriGameBoard(**data)
+
+    cells = [
+        HitoriGameBoardCell(hitori_game_board=board, row_number=i, column_number=j)
+        for i in range(board.number_of_rows)
+        for j in range(board.number_of_columns)
+    ]
+
+    db_session.add(board)
+    db_session.add_all(cells)
+
+    db_session.flush()
+
+    return HitoriGameBoardSchema(strict=True).dump(board).data
+
+
+@view_config(
+    route_name='hitori_board_clone',
+    request_method='POST',
+    renderer='json'
+)
+@use_kwargs({'board_id': fields.Int(required=True, location='matchdict')})
+def hitori_board_clone(request, board_id):
+    db_session = request.db_session
+
+    board = db_session.query(HitoriGameBoard).get(board_id)
+
+    new_board = clone_hitori_game_board(db_session, board)
+
+    db_session.flush()
+
+    return {'id': new_board.id}
+
+
+@view_config(
     route_name='hitori_board_solve',
     request_method='GET',
     renderer='json'
@@ -66,6 +114,26 @@ def hitori_board_solve(request, board_id):
 
     get_hitori_solve_chain(board_id, solve.id)()
     return {'solve_id': solve.id}
+
+
+@view_config(
+    route_name='hitori_cell_value',
+    request_method='POST',
+    renderer='json'
+)
+@use_kwargs({'cell_id': fields.Int(required=True, location='matchdict')})
+def hitori_cell_value_update(request, cell_id):
+    db_session = request.db_session
+
+    cell = db_session.query(HitoriGameBoardCell).get(cell_id)
+
+    value = request.json_body['value']
+
+    cell.value = value
+
+    db_session.flush()
+
+    return HitoriGameBoardCellSchema().dump(cell).data
 
 
 @view_config(
