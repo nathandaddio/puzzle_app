@@ -188,26 +188,35 @@ class HitoriEngineSolutionAdapter(object):
         self._engine_data = engine_data
 
     def get_solution(self):
-        return HitoriSolution(
-            cells_on=[
-                cell
-                for cell, var in self._variables.cell_on.items()
-                if gurobi_binary_variable_is_true(var)
-            ],
-            cells_off=[
-                cell
-                for cell, var in self._variables.cell_on.items()
-                if not gurobi_binary_variable_is_true(var)
-            ],
-            board=self._engine_data.board
-        )
+        if self._model.solCount > 0:
+            return HitoriSolution(
+                cells_on=[
+                    cell
+                    for cell, var in self._variables.cell_on.items()
+                    if gurobi_binary_variable_is_true(var)
+                ],
+                cells_off=[
+                    cell
+                    for cell, var in self._variables.cell_on.items()
+                    if not gurobi_binary_variable_is_true(var)
+                ],
+                board=self._engine_data.board
+            )
+        else:
+            return HitoriSolution(
+                cells_on=[],
+                cells_off=[],
+                board=self._engine_data.board,
+                feasible=False
+            )
 
 
 class HitoriSolution(object):
-    def __init__(self, cells_on, cells_off, board):
+    def __init__(self, cells_on, cells_off, board, feasible=True):
         self.cells_on = cells_on
         self.cells_off = cells_off
         self.board = board
+        self.feasible = feasible
 
 
 class HitoriEngineCallback(object):

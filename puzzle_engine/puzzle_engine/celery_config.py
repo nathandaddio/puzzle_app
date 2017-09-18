@@ -14,7 +14,10 @@ CELERY_ROUTES = {
     },
     "puzzle_app.jobs.hitori_engine_input": {
         "queue": "puzzle_app",
-    }
+    },
+    "puzzle_app.jobs.hitori_solve_status": {
+        "queue": "puzzle_app",
+    },
 }
 
 CELERY_RESULT_BACKEND = 'rpc'

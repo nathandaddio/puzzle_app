@@ -54,6 +54,7 @@ class HitoriSolutionSchema(Schema):
     cells_on = fields.Nested(CellSchema, many=True, only='id')
     cells_off = fields.Nested(CellSchema, many=True, only='id')
     board = fields.Nested(BoardSchema, only='id')
+    feasible = fields.Bool(required=True)
 
 
 def load_board(json_object_data):
