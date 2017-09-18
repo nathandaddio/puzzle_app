@@ -15,6 +15,7 @@ class App extends Component {
           rows={board.number_of_rows}
           columns={board.number_of_columns}
           key={board.id}
+          feasible={board.feasible}
           solve={() => this.props.solveBoardClick(board.id)}
           clone={() => this.props.cloneBoardClick(board.id)}
           updateCellValue={this.props.updateCellValueOnChange}

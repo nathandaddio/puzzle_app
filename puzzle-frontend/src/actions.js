@@ -90,5 +90,6 @@ var poll = (promiseFn, time) => promiseFn().then(
              response => {
                 console.log(response);
                 if (response === "SUCCESS") {return response}
+                if (response === "FAILURE") {return response}
                 return sleep(time).then(() => poll(promiseFn, time));
             })

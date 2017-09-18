@@ -40,6 +40,10 @@ class Board extends React.Component {
               {this.props.name}
             </div>
 
+            <div className='feasibility'>
+              {this.props.feasible === false ? "Board is infeasible" : ""}
+            </div>
+
             <form onSubmit={(e) => {e.preventDefault(); this.props.solve(); }}>
                 {this.renderRows(matrix)}
                 <SolveButton/>
@@ -155,7 +159,8 @@ Board.propTypes = {
         })
     ).isRequired,
     columns: PropTypes.number.isRequired,
-    rows: PropTypes.number.isRequired
+    rows: PropTypes.number.isRequired,
+    feasible: PropTypes.bool
 }
 
 
