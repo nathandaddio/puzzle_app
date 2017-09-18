@@ -32,7 +32,7 @@ def make_hitori_engine_data(hitori_game_board_id):
     return HitoriGameBoardSchema(strict=True).dump(hitori_game_board).data
 
 
-HitoriSolution = namedtuple('HitoriSolution', ['board', 'cells_on', 'cells_off'])
+HitoriSolution = namedtuple('HitoriSolution', ['board', 'cells_on', 'cells_off', 'feasible'])
 
 
 def read_hitori_engine_data(hitori_engine_solution):
@@ -40,7 +40,10 @@ def read_hitori_engine_data(hitori_engine_solution):
 
     with transaction.manager:
         db_session = db_session_maker()
-        db_session.query(HitoriGameBoard).get(solution.board).solved = True
+        board = db_session.query(HitoriGameBoard).get(solution.board)
+
+        board.solved = True
+        board.feasible = solution.feasible
 
         for cell_id in solution.cells_on:
             db_session.query(HitoriGameBoardCell).get(cell_id).included_in_solution = True

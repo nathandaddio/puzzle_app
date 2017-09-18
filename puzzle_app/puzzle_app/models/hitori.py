@@ -33,6 +33,8 @@ class HitoriGameBoard(Base):
 
     solved = Column(Boolean(name="solved"))
 
+    feasible = Column(Boolean(name="feasible"))
+
 
 class HitoriGameBoardCell(Base):
     __tablename__ = 'hitori_game_board_cells'

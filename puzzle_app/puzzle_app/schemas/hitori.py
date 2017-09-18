@@ -41,6 +41,8 @@ class HitoriGameBoardSchema(Schema):
 
     solved = fields.Bool(allow_none=True)
 
+    feasible = fields.Bool(allow_none=True)
+
     @post_dump
     def order_cells(self, data):
         data['cells'] = sorted(data['cells'], key=lambda cell: (cell['row_number'], cell['column_number']))
