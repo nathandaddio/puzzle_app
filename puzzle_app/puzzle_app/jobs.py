@@ -18,8 +18,7 @@ from puzzle_app.models import HITORI_SOLVE_STATUS
 @app.task
 def hitori_engine_input(hitori_game_board_id, solve_id):
     data = make_hitori_engine_data(hitori_game_board_id)
-    data['solve_id'] = solve_id
-    return data
+    return dict(solve_id=solve_id, **data)
 
 
 hitori_solve = signature('puzzle_engine.engine_worker.run_hitori_solve')
@@ -40,7 +39,7 @@ def hitori_solve_status(*args, **kwargs):
 def get_hitori_solve_chain(board_id, solve_id):
     return chain(
         hitori_engine_input.s(board_id, solve_id),
-        hitori_solve.on_error(hitori_solve_status.s(solve_id=solve_id, status=HITORI_SOLVE_STATUS.FAILURE.name)),
+        hitori_solve,
         hitori_engine_output.s(),
         hitori_solve_status.s(solve_id=solve_id, status=HITORI_SOLVE_STATUS.SUCCESS.name)
     ).on_error(hitori_solve_status.s(solve_id=solve_id, status=HITORI_SOLVE_STATUS.FAILURE.name))
