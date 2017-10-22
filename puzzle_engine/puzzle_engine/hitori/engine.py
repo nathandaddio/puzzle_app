@@ -203,12 +203,7 @@ class HitoriEngineSolutionAdapter(object):
                 board=self._engine_data.board
             )
         else:
-            return HitoriSolution(
-                cells_on=[],
-                cells_off=[],
-                board=self._engine_data.board,
-                feasible=False
-            )
+            return HitoriSolution.infeasible_solution(self._engine_data.board)
 
 
 class HitoriSolution(object):
@@ -217,6 +212,15 @@ class HitoriSolution(object):
         self.cells_off = cells_off
         self.board = board
         self.feasible = feasible
+
+    @classmethod
+    def infeasible_solution(cls, board):
+        return cls(
+            cells_on=[],
+            cells_off=[],
+            board=board,
+            feasible=False
+        )
 
 
 class HitoriEngineCallback(object):

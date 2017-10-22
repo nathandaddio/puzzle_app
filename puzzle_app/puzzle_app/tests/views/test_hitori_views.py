@@ -46,6 +46,7 @@ class TestHitoriGameBoardsGet:
                 'number_of_rows': board.number_of_rows,
                 'number_of_columns': board.number_of_columns,
                 'solved': False,
+                'feasible': None,
                 'cells': [  # note that the order of the cells changes as we return (row, column) order of cells
                     {
                         'id': cells[1].id,

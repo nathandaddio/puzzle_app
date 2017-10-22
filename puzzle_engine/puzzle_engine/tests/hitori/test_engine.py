@@ -275,11 +275,16 @@ class TestGurobiBinaryVariableIsTrue:
 
 class TestHitoriSolution:
     @pytest.fixture
-    def data(self):
+    def board(self):
+        return mock.Mock()
+
+    @pytest.fixture
+    def data(self, board):
         return {
             'cells_on': [mock.Mock(), mock.Mock()],
             'cells_off': [mock.Mock()],
-            'board': mock.Mock()
+            'board': board,
+            'feasible': True
         }
 
     @pytest.fixture
@@ -290,11 +295,21 @@ class TestHitoriSolution:
         for attr, value in data.items():
             assert getattr(hitori_solution, attr) == value
 
+    @pytest.fixture
+    def hitori_solution_infeasible_solution(self, board):
+        return HitoriSolution.infeasible_solution(board)
+
+    def test_hitori_solution_infeasible(self, board, hitori_solution_infeasible_solution):
+        assert hitori_solution_infeasible_solution.board == board
+        assert hitori_solution_infeasible_solution.cells_on == []
+        assert hitori_solution_infeasible_solution.cells_off == []
+        assert not hitori_solution_infeasible_solution.feasible
+
 
 class TestHitoriEngineSolutionAdapter:
     @pytest.fixture
     def model(self):
-        return mock.Mock()
+        return mock.Mock(solCount=1)  # model with a solution
 
     @pytest.fixture
     def cell_on(self, cells):  # mocking out gurobi variables
@@ -325,7 +340,8 @@ class TestHitoriEngineSolutionAdapter:
         return {
             'cells_on': [cells[1], cells[2]],
             'cells_off': [cells[0], cells[3]],
-            'board': board
+            'board': board,
+            'feasible': True
         }
 
     @pytest.fixture
@@ -344,3 +360,13 @@ class TestHitoriEngineSolutionAdapter:
         assert set(hitori_engine_solution.cells_on) == set(expected['cells_on'])
         assert set(hitori_engine_solution.cells_off) == set(expected['cells_off'])
         assert hitori_engine_solution.board == expected['board']
+        assert hitori_engine_solution.feasible == expected['feasible']
+
+    def test_hitori_engine_solution_adapter_infeasible(self, model, board, hitori_engine_solution_adapter):
+        model.solCount = 0  # model has no solution (or no solution was found)
+        solution = hitori_engine_solution_adapter.get_solution()
+
+        assert solution.cells_on == []
+        assert solution.cells_off == []
+        assert solution.board == board
+        assert not solution.feasible

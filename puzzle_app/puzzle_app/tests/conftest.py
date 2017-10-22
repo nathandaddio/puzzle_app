@@ -33,3 +33,11 @@ def dummy_request(db_session):
 def set_sqlalchemy_session_on_factories(db_session):
     for factory_cls in FACTORIES:
         factory_cls._meta.sqlalchemy_session = db_session
+
+
+@pytest.fixture(scope='session')
+def celery_config():
+    return {
+        'broker_url': 'amqp://',
+        'result_backend': 'rpc'
+    }
